@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import SushiContainer from './containers/SushiContainer';
 import Table from './containers/Table';
+import WalletContainer from './containers/walletContainer'
 
 // Endpoint!
 const API = "http://localhost:3000/sushis"
@@ -24,12 +25,13 @@ class App extends Component {
   }
 
   addToEatenList = (sushi) => {
-    if (this.state.balance - sushi.price >= 0) {
+    if (this.state.balance >= sushi.price && !this.state.eatenList.includes(sushi)) {
       this.setState({
         eatenList: [...this.state.eatenList, sushi],
         balance: this.state.balance - sushi.price
       })
-    }
+    } 
+  }
 
   componentDidMount() {
     fetch(API)
@@ -41,7 +43,13 @@ class App extends Component {
       })
   }
 
-
+  updateBalance = (e) => {
+    e.preventDefault()
+    this.setState({
+      balance: this.state.balance + parseInt(e.target.cash.value)
+    });
+    e.target.reset()
+ }
 
   render() {
     const sushisToRender = this.state.sushisList.slice(
@@ -59,7 +67,12 @@ class App extends Component {
         />
         <Table
           plates={this.state.eatenList}
-          balance={this.state.balance} />
+          balance={this.state.balance}
+        />
+        <WalletContainer
+          balance={this.state.balance}
+          updateBalance={this.updateBalance}
+        />
       </div>
     );
   }
